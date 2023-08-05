@@ -1,0 +1,12 @@
+android/*    linguist-vendored
+android/**/* linguist-vendored
+ios/*        linguist-vendored
+ios/**/*     linguist-vendored
+macos/*      linguist-vendored
+macos/**/*   linguist-vendored
+linux/*      linguist-vendored
+linux/**/*   linguist-vendored
+windows/*    linguist-vendored
+windows/**/* linguist-vendored
+web/*        linguist-vendored
+web/**/*     linguist-vendored

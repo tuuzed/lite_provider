@@ -17,12 +17,77 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const CounterPage(),
     );
   }
 }
 
-class CounterModel with ChangeNotifier {
+class CounterPage extends StatelessWidget {
+  const CounterPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // return LiteProvider<CounterModel1>(
+    //   create: (_) => CounterModel1(),
+    //   child: Builder(
+    //     builder: (context) => Text("${context.watch<CounterModel1>().count}"),
+    //   ),
+    // );
+    return MutilLiteProvider(
+      providers: [
+        LiteProvider<CounterModel1>(create: (_) => CounterModel1()),
+        LiteProvider<CounterModel2>(create: (_) => CounterModel2()),
+      ],
+      child: Builder(builder: (context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("LiteProivder"),
+          ),
+          body: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Consumer<CounterModel1>(
+                  builder: (_, model) => Text(
+                    "Counter1: ${model.count}",
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                ),
+                Consumer<CounterModel2>(
+                  builder: (_, model) => Text(
+                    "Counter2: ${model.count}",
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      child: const Text('Incrence1'),
+                      onPressed: () {
+                        context.read<CounterModel1>().count++;
+                      },
+                    ),
+                    ElevatedButton(
+                      child: const Text('Incrence2'),
+                      onPressed: () {
+                        context.read<CounterModel2>().count++;
+                      },
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class CounterModel1 with ChangeNotifier {
   int _count = 0;
 
   int get count => _count;
@@ -33,34 +98,13 @@ class CounterModel with ChangeNotifier {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class CounterModel2 with ChangeNotifier {
+  int _count = 0;
 
-  @override
-  Widget build(BuildContext context) {
-    return LiteProvider(
-      create: (context) => CounterModel(),
-      child: Builder(builder: (context) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("LiteProivder"),
-          ),
-          body: Center(
-            child: Consumer<CounterModel>(
-              builder: (_, model) => Text(
-                "${model.count}",
-                style: const TextStyle(fontSize: 24),
-              ),
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add),
-            onPressed: () {
-              context.read<CounterModel>().count++;
-            },
-          ),
-        );
-      }),
-    );
+  int get count => _count;
+
+  set count(value) {
+    _count = value;
+    notifyListeners();
   }
 }

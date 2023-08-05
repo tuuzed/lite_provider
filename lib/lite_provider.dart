@@ -1,13 +1,18 @@
 import 'package:flutter/widgets.dart';
 
+// ignore: must_be_immutable
 class LiteProvider<T extends Listenable> extends StatefulWidget {
   final T Function(BuildContext) create;
-  final Widget child;
+  Widget? child;
 
-  const LiteProvider({super.key, required this.create, required this.child});
+  LiteProvider({super.key, required this.create, this.child});
+
+  _injectChild(Widget child) {
+    this.child = child;
+  }
 
   @override
-  State<LiteProvider> createState() => _LiteProviderState<T>();
+  State<LiteProvider<T>> createState() => _LiteProviderState<T>();
 
   static T of<T>(BuildContext context, {bool listen = true}) {
     if (listen) {
@@ -38,10 +43,29 @@ class _LiteProviderState<T extends Listenable> extends State<LiteProvider<T>> {
       builder: (context, child) {
         return _InheritedWidget<T>(
           model: model,
-          child: widget.child,
+          child: widget.child ?? ErrorWidget("LiteProvider not child!"),
         );
       },
     );
+  }
+}
+
+class MutilLiteProvider extends StatelessWidget {
+  final List<LiteProvider<dynamic>> providers;
+  final Widget child;
+  const MutilLiteProvider({
+    super.key,
+    required this.providers,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var child_ = child;
+    for (var i = providers.length - 1; i >= 0; i--) {
+      child_ = providers[i].._injectChild(child_);
+    }
+    return child_;
   }
 }
 
